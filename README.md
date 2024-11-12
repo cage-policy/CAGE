@@ -19,7 +19,9 @@ conda env create -f CAGE.yaml
 
 ### 🛢️ Data Collection
 
-We apply the data collection process in the <a href="https://rh20t.github.io/">RH20T</a> paper. We provide the sample data for each tasks on [Google Drive](https://drive.google.com/drive/folders/1BHY-hiYlHjHPNlvUMePhZ3alQ7dMYRtd?usp=sharing) and [Baidu Netdisk](https://pan.baidu.com/s/1l-P9fAqlrDHS1LvT5gNnYA) (code: vwxq). For detailed descriptions, please refer to [RISE data collection](https://github.com/rise-policy/rise?tab=readme-ov-file#%EF%B8%8F-data-collection).
+We apply the same data collection process as described in <a href="https://rh20t.github.io/">RH20T</a>: The robotic arm is equipped with an in-hand camera and faces directly to a fixed camera. A haptic device is then used to collect expert demonstrations. Since CAGE utilizes only RGB images, **no calibration is required**.
+
+We provide the sample data for each task on [Google Drive](https://drive.google.com/drive/folders/1BHY-hiYlHjHPNlvUMePhZ3alQ7dMYRtd?usp=sharing) and [Baidu Netdisk](https://pan.baidu.com/s/1l-P9fAqlrDHS1LvT5gNnYA) (code: vwxq).
 
 ### 🧑🏻‍💻 Training
 
