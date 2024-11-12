@@ -1,0 +1,73 @@
+dataset:
+  sample_interval: 1
+  obs_horizon: 4
+  act_horizon: 20
+  act_repr: rel
+  timestamp_unit: 100  # ms
+  geo_aug: true
+  val_meta_data:  # configs here will override those in 'meta_data' for validation dataset
+    split: 0.1
+  meta_data:
+    path: RH20T.csv
+    split: null
+    configs: null
+    tasks: [4]
+    camera_ids:
+      main: fixed
+      in_hand: null # use all cameras
+      fixed: {  # front camera for each config
+        1: ['cam_750612070851'],
+        2: ['cam_f0461559'],
+        3: ['cam_f0172289'],
+        4: ['cam_f0172289'],
+        5: ['cam_f0461559'],
+        6: ['cam_f0271510'],
+        7: ['cam_f0271510'],
+      }
+
+    in_hand_views: 1
+    fixed_views: 1
+  
+  num_workers: 16
+
+epoch: 500
+batch_size: 16
+gradient_accumulation_steps: 1  # calculated by target batchsize / (batchsize * num of GPUs)
+
+learning_rate: 1e-4   # 1e-4 maximum!
+lr_scheduler: cosine  # constant/cosine/cosine_with_restarts
+lr_cycles: 0.5        # to have lr->0 at the end, cosine: x.5, cosine_with_restarts: x
+warm_up_steps: 500
+
+gradient_clipping: 1.
+checkpoint_steps: null
+
+validation_step_interval: 1000
+
+model:
+  name: attn_unet
+  obs_dim: 512
+  # model specific params are in model/name.yaml
+  
+  use_proprio: true # concatenate prev actions to noisy actions
+  timesteps: 100    # diffusion timesteps
+
+  use_perceiver: true
+  perceiver:
+    layers: 4
+    dropout: 0.1
+  
+  use_in_hand: true
+  use_fixed: true
+  image_encoder:
+    name: dinov2-large    # resnet-50/dinov2-large
+    pooled: false         # true: B, 1, D; false: B, L, D
+    freeze: true
+    lr_ratio: 1.
+    use_lora: true
+    lora:
+      r: 16
+      alpha: 16
+      dropout: 0.1
+      bias: none        # none / lora_only
+      target_modules: ['query', 'key', 'value']

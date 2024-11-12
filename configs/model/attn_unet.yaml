@@ -1,0 +1,6 @@
+model:
+  params:
+    down_dims: [256, 512, 1024]
+    layers_per_block: 2
+    conv_kernel_size: 3
+    num_attn_heads: 8

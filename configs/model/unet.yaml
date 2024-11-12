@@ -1,0 +1,4 @@
+model:
+  params:
+    down_dims: [256, 512, 1024]
+    conv_kernel_size: 5

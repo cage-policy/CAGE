@@ -1,0 +1,38 @@
+name: cage
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - accelerate=0.27.0=pyhd8ed1ab_0
+  - cuda-cudart=11.8.89=0
+  - cuda-libraries=11.8.0=0
+  - cuda-nvcc=11.8.89=0
+  - cuda-runtime=11.8.0=0
+  - cudatoolkit=11.8.0=h4ba93d1_13
+  - cudnn=8.9.7.29=hbc23b4c_3
+  - diffusers=0.26.3=pyhd8ed1ab_0
+  - einops=0.7.0=pyhd8ed1ab_1
+  - numpy=1.26.4=py310hb13e2d6_0
+  - omegaconf=2.3.0=pyhd8ed1ab_0
+  - opencv=4.7.0=py310hff52083_1
+  - pandas=2.2.1=py310hcc13569_0
+  - peft=0.10.0=pyhd8ed1ab_0
+  - pillow=9.4.0=py310h023d228_1
+  - pip=24.0=pyhd8ed1ab_0
+  - plotly=5.19.0=pyhd8ed1ab_0
+  - python=3.10.13=hd12c33a_0_cpython
+  - pytorch=2.2.1=py3.10_cuda11.8_cudnn8.7.0_0
+  - pytorch-cuda=11.8=h7e8668a_5
+  - pytorch-mutex=1.0=cuda
+  - safetensors=0.4.2=py310hcb5633a_0
+  - tensorboard=2.16.2=pyhd8ed1ab_0
+  - torchaudio=2.2.1=py310_cu118
+  - torchvision=0.17.1=py310_cu118
+  - tqdm=4.66.2=pyhd8ed1ab_0
+  - transformers=4.33.3=pyhd8ed1ab_0
+  - transforms3d=0.4.1=pyhd8ed1ab_0
+  - wandb=0.16.3=pyhd8ed1ab_0
+  - pip:
+      - deepspeed==0.13.5
+      - ninja==1.11.1.1

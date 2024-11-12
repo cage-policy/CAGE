@@ -1,0 +1,53 @@
+dataset:
+  sample_interval: 1
+  obs_horizon: 2
+  act_horizon: 16
+  act_repr: rel
+  timestamp_unit: 100  # ms
+  geo_aug: true
+  val_meta_data:
+    split: 0.1
+  meta_data:
+    path: sample_dataset.csv
+    split: null
+    configs: null
+    tasks: [4]
+    camera_ids:
+      main: fixed
+      in_hand: null # use all cameras
+      fixed: null   # use all cameras
+
+    in_hand_views: 1
+    fixed_views: 1
+  
+  num_workers: 16
+
+epoch: 500
+batch_size: 64
+gradient_accumulation_steps: 1  # calculated by target batchsize / (batchsize * num of GPUs)
+
+learning_rate: 1e-4   # 1e-4 maximum!
+lr_scheduler: cosine  # constant/cosine/cosine_with_restarts
+lr_cycles: 0.5        # to have lr->0 at the end, cosine: x.5, cosine_with_restarts: x
+warm_up_steps: 500
+
+gradient_clipping: 1.
+checkpoint_steps: null
+
+validation_step_interval: 1000
+
+model:
+  name: unet
+  obs_dim: 512
+  weight_decay: 1e-6
+  
+  use_proprio: false
+  timesteps: 100    # diffusion timesteps
+
+  use_in_hand: true
+  use_fixed: true
+  image_encoder:
+    name: resnet-50  # only resnet-x is supported
+    pretrain: false
+    lr_ratio: 1.0
+    weight_decay: 1e-6

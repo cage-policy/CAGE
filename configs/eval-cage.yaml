@@ -1,0 +1,47 @@
+ckpt: PATH_TO_CKPT
+device: 0 # GPU id
+seed: 42
+max_timestep: 1000
+denoising_steps: 16
+act_horizon_eval: 12
+
+dataset:
+  obs_horizon: 4
+  act_horizon: 20
+  act_repr: rel
+  meta_data:
+    in_hand_views: 1
+    fixed_views: 1
+model:
+  name: attn_unet
+  obs_dim: 512
+  params:
+    down_dims:
+    - 256
+    - 512
+    - 1024
+    layers_per_block: 2
+    conv_kernel_size: 3
+    num_attn_heads: 8
+  use_proprio: true
+  use_perceiver: true
+  perceiver:
+    layers: 4
+    dropout: 0.1
+  use_in_hand: true
+  use_fixed: true
+  image_encoder:
+    name: dinov2-large
+    pooled: false
+    freeze: true
+    lr_ratio: 1.0
+    use_lora: true
+    lora:
+      r: 16
+      alpha: 16
+      dropout: 0.1
+      bias: none
+      target_modules:
+      - query
+      - key
+      - value
