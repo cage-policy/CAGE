@@ -66,6 +66,7 @@ class Agent:
 
     def __del__(self):
         self.policy_process.terminate()
+        self.policy_process.join()
         
         self.act_shm.close()
         self.act_shm.unlink()

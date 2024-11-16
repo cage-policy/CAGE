@@ -57,6 +57,9 @@ class RealSenseRGBDCamera:
             self.streaming.value = 0
             self.timer.set()
             self.process.join()
+        else:
+            self.process.terminate()
+            self.process.join()
 
         self.shm_color.close()
         self.shm_color.unlink()
@@ -94,7 +97,7 @@ class RealSenseRGBDCamera:
         pipeline.start(config)
 
         # drop first few frames
-        for _ in range(20):
+        for _ in range(40):
             frameset = align.process(pipeline.wait_for_frames())
             color_image = np.asanyarray(frameset.get_color_frame().get_data()).astype(np.uint8)
             if enable_depth:

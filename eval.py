@@ -46,27 +46,29 @@ def main(args):
     # merge conf with args
     conf = OmegaConf.merge(base_conf, OmegaConf.create(vars(args)))
 
-    # synchronize all devices to the same time
-    step_sync = Barrier(
-        1+1+1+conf.dataset.meta_data.fixed_views+conf.dataset.meta_data.in_hand_views
-    )
-
-    print('[Main] Init Robotic Arm')
-    ready_xyz = [0.4, 0.0, 0.17]
+    # TODO: change the ready pose according to your initial pose in the training dataset
+    ready_xyz = [0.4, 0.0, 0.22]
     ready_rot = np.array([
         [-1.,  0.,  0.],
         [ 0.,  1.,  0.],
         [ 0.,  0., -1.]
     ])
 
+    # synchronize all devices to the same time
+    step_sync = Barrier(
+        1+1+1+conf.dataset.meta_data.fixed_views+conf.dataset.meta_data.in_hand_views
+    )
+
+    print('[Main] Init Robotic Arm')
     robot = FlexivRobot(robot_ip_address='192.168.2.100', pc_ip_address='192.168.2.35', step_sync=step_sync)
-    xyz, rot = robot.get_tcp_pose(real_time=True)
-    xyz[2] = 0.17
-    robot.send_tcp_pose(xyz, rot)
-    time.sleep(1)
-    robot.send_tcp_pose(ready_xyz, ready_rot)
     # default is [10,10,10, 5,5,5]
     robot.set_max_contact_wrench(np.array([10,10,10, 4,4,4]))
+
+    xyz, rot = robot.get_tcp_pose(real_time=True)
+    xyz[2] = ready_xyz[2]
+    robot.send_tcp_pose(xyz, rot)
+    time.sleep(0.5)
+    robot.send_tcp_pose(ready_xyz, ready_rot)
 
     print('[Main] Init Gripper')
     gripper = DahuanAG95Gripper('/dev/ttyUSB0', step_sync=step_sync)
@@ -92,7 +94,7 @@ def main(args):
         wrist_cam_obs.append([])
 
     print('[Main] Init agent')
-    agent = CAGEAgent(conf, blocking=False, temporal_ensemble=args.t_ensemble, k=[0.05, 0.05, None])    # no smoothing on width
+    agent = CAGEAgent(conf, blocking=False, temporal_ensemble=args.t_ensemble, k=[0.05, 0.05, -0.1])    # less smoothing on width
     
     # init obs_dict
     obs_dict = {}
@@ -182,22 +184,16 @@ def main(args):
             print(f'[Main] Step time: {end_time - start_time:.4f}')
             time.sleep(max(0, step_time - (end_time - start_time)))
     finally:
-        # clean up
-        del agent
-        for cam in global_cams:
-            del cam
-        for cam in wrist_cams:
-            del cam
-        del gripper
+        # terminate all streaming threads
+        step_sync.abort()
 
         # go back to ready pose before exiting
         xyz, rot = robot.get_tcp_pose()
-        xyz[2] = 0.17
+        xyz[2] = ready_xyz[2]
         robot.send_tcp_pose(xyz, rot)
         time.sleep(0.5)
         robot.send_tcp_pose(ready_xyz, ready_rot)
         time.sleep(1)
-        del robot
 
 
 if __name__ == '__main__':
