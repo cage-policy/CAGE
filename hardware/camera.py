@@ -52,14 +52,12 @@ class RealSenseRGBDCamera:
             time.sleep(0.1)
         
     def __del__(self):
-        if self.timer:
-            # stop the streaming thread
-            self.streaming.value = 0
+        self.streaming.value = 0
+        if self.timer is not None:
             self.timer.set()
-            self.process.join()
         else:
             self.process.terminate()
-            self.process.join()
+        self.process.join()
 
         self.shm_color.close()
         self.shm_color.unlink()

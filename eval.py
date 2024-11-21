@@ -34,7 +34,7 @@ def discrete_rotation(start_rot, end_rot, step=np.pi/16):
         rot_list.append(rot6d_to_rotation_matrix(rot6d_i))
     return rot_list
 
-def main(args):
+def main(args, unknown):
     ctrl_freq = args.ctrl_freq
 
     base_conf = OmegaConf.load(os.path.join('configs', args.config+'.yaml'))
@@ -44,7 +44,7 @@ def main(args):
         model_conf = OmegaConf.load(model_conf_path)
         base_conf = OmegaConf.merge(base_conf, model_conf)
     # merge conf with args
-    conf = OmegaConf.merge(base_conf, OmegaConf.create(vars(args)))
+    conf = OmegaConf.merge(base_conf, OmegaConf.create(vars(args)), OmegaConf.from_dotlist(unknown))
 
     # TODO: change the ready pose according to your initial pose in the training dataset
     ready_xyz = [0.4, 0.0, 0.22]
@@ -178,8 +178,7 @@ def main(args):
 
             if prev_width is None or abs(prev_width-width) > 0.006 or (prev_width > 0 and width == 0):
                 prev_width = width
-                # TODO: blocking?
-                gripper.set_width(width)
+                gripper.set_width(width, blocking=True)
             end_time = time.time()
             print(f'[Main] Step time: {end_time - start_time:.4f}')
             time.sleep(max(0, step_time - (end_time - start_time)))
@@ -213,4 +212,4 @@ if __name__ == '__main__':
 
     parser.add_argument('--t_ensemble', action='store_true', help='use temporal ensemble for stable and smooth trajectory')
 
-    main(parser.parse_args())
+    main(*parser.parse_known_args())

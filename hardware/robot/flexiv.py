@@ -41,6 +41,8 @@ class FlexivRobot(Robot):
         super().__init__(step_sync, streaming_freq, waiting_gap)
 
     def __del__(self):
+        super().__del__()
+        
         self.robot.stop()
         while self.robot.getMode() != self.mode_mapper['idle']:
             time.sleep(0.005)

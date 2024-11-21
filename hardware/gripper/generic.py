@@ -30,14 +30,24 @@ class Gripper:
         self.init_open()
 
         # start the streaming thread
+        self.is_streaming = False
         self.streaming_thread = Thread(
             target=self._streaming,
             daemon=True)
         self.streaming_thread.start()
+
+    def __del__(self):
+        self.is_streaming = False
+        if isinstance(self.timer, Event):
+            self.timer.set()
+        else:
+            self.timer.abort()
+        self.streaming_thread.join()
     
     def _streaming(self):
         print('[Gripper] Start streaming ...')
-        while True:
+        self.is_streaming = True
+        while self.is_streaming:
             try:
                 with self.info_lock:
                     self._update_info()

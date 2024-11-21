@@ -33,14 +33,27 @@ class Robot:
 
         self.initialize()
 
+        self.is_streaming = False
         self.streaming_thread = Thread(
             target=self._streaming,
             daemon=True)
         self.streaming_thread.start()
 
+    def __del__(self):
+        self.is_streaming = False
+        if isinstance(self.timer, Event):
+            self.timer.set()
+        else:
+            self.timer.abort()
+        self.streaming_thread.join()
+
+        self.command_queue.put(None)
+        self.command_thread.join()
+
     def _streaming(self):
         print('[Robot] Start streaming ...')
-        while True:
+        self.is_streaming = True
+        while self.is_streaming:
             try:
                 with self.status_lock:
                     self._update_status()
@@ -50,7 +63,11 @@ class Robot:
 
     def _command_execution(self):
         while True:
-            func, args = self.command_queue.get()
+            cmd = self.command_queue.get()
+            if cmd is None:
+                break
+            
+            func, args = cmd
             try:
                 func(*args)
             except Exception as e:
