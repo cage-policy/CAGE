@@ -145,7 +145,7 @@ In *similar environments*, CAGE offers an average of **42% increase in task comp
 @article{
   xia2024cage,
   title   = {CAGE: Causal Attention Enables Data-Efficient Generalizable Robotic Manipulation},
-  author  = {Xia, Shangning and Fang, Hongjie and Fang, Hao-Shu and Lu, Cewu},
+  author  = {Xia, Shangning and Fang, Hongjie and Lu, Cewu and Fang, Hao-Shu},
   journal = {arXiv preprint arXiv:2410.14974},
   year    = {2024}
 }
@@ -153,4 +153,4 @@ In *similar environments*, CAGE offers an average of **42% increase in task comp
 
 ## 📃 License
 
-<a href="https://cage-policy.github.io/">CAGE</a> (including data and codebase) by <a href="https://github.com/Xiashangning">Shangning Xia</a>, <a href="https://tonyfang.net/">Hongjie Fang</a>, <a href="https://fang-haoshu.github.io/">Hao-Shu Fang</a>, <a href="https://www.mvig.org/">Cewu Lu</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-SA 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" alt=""></a></p>
+<a href="https://cage-policy.github.io/">CAGE</a> (including data and codebase) by <a href="https://github.com/Xiashangning">Shangning Xia</a>, <a href="https://tonyfang.net/">Hongjie Fang</a>, <a href="https://www.mvig.org/">Cewu Lu</a>, <a href="https://fang-haoshu.github.io/">Hao-Shu Fang</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-SA 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" alt=""></a></p>
