@@ -306,9 +306,7 @@ class RealWorldDataset(Dataset):
 
             # the length of a task is defined to be the number of the units in the common part of the video
             start_timestamp = s.start_timestamp
-            end_timestamp = s.end_timestamp
-            length = int(np.ceil((end_timestamp - start_timestamp) / self.timestamp_unit))
-            cnts = np.zeros(length)
+            idx = set()
 
             task_dict['fixed'] = {}
             task_dict['in_hand'] = {}
@@ -329,8 +327,6 @@ class RealWorldDataset(Dataset):
                 arr = []
                 for i in range(row.start_frame_idx, row.end_frame_idx+1):
                     timestamp = timestamps[i]
-                    if row.cam_type == self.main_cam:
-                        cnts[(timestamp - start_timestamp) // self.timestamp_unit] += 1
 
                     tcp_path = os.path.join(tcp_dir, '%d.npy'%timestamp)
                     gripper_pose = np.load(tcp_path)
@@ -346,22 +342,24 @@ class RealWorldDataset(Dataset):
 
                     # dim=16 in total
                     arr.append([i, timestamp, *gripper_xyz, *gripper_mat.flatten(), gripper_cur_width, gripper_command_width])
-                # fix potential overflow tcp values (e.g. -9.432e+36)
                 arr = np.array(arr)
-                idx = np.argwhere(np.abs(arr[:, 2:]) > 2)
-                for i in idx:
+                # fix potential overflow tcp values (e.g. -9.432e+36)
+                for i in np.argwhere(np.abs(arr[:, 2:]) > 2):
                     n = i[0]
                     m = i[1]+2
                     prev = arr[n-1]
                     next = arr[n+1]
                     # interpolate the missing value
                     arr[n, m] = prev[m] + (next[m] - prev[m]) / (next[1] - prev[1]) * (arr[n, 1] - prev[1])
+
+                arr = self._filter_frames(arr, trans_delta=0.005, rot_delta=np.pi/24, width_delta=0.005)
+
+                if row.cam_type == self.main_cam:
+                    idx |= set(((arr[:, 1] - start_timestamp) // self.timestamp_unit).astype(int))
                 
                 task_dict[row.cam_type][cam_id] = arr
-
-            idx = np.flatnonzero(cnts)
-            length = len(idx)
-            self.task_indices.extend([len(self.tasks)] * length)
+            idx = sorted(idx)
+            self.task_indices.extend([len(self.tasks)] * len(idx))
             self.reference_timestamps.extend([start_timestamp + i*self.timestamp_unit for i in idx])
             self.tasks.append(task_dict)
 
@@ -504,3 +502,45 @@ class RealWorldDataset(Dataset):
         while len(indices) < len(ref_timestamps):
             indices.append(len(timestamps)-1)
         return indices
+
+    def _diff(self, arr, id1, id2, trans_delta=0.005, rot_delta=np.pi/12, width_delta=0.005):
+        if id1 == id2:
+            return False
+        if id1 > id2:
+            id1, id2 = id2, id1
+
+        def _diff_along_axis(sequence, delta):
+            if np.any(np.abs(sequence[id1]-sequence[id2]) > delta):
+                return True
+            return False
+            
+        def _diff_rotation(quat_sequence, delta):
+            mat1 = quat_sequence[id1].reshape(3,3)
+            mat2 = quat_sequence[id2].reshape(3,3)
+            rot_diff = np.matmul(mat1, mat2.T)
+            rot_diff = np.diag(rot_diff).sum()
+            rot_diff = min(max((rot_diff-1)/2, -1), 1)
+            rot_diff = np.arccos(rot_diff)
+            return rot_diff > delta
+
+        if _diff_along_axis(arr[:, 2:5], trans_delta):
+            return True
+        if _diff_along_axis(arr[:, -2], width_delta):
+            return True
+        if _diff_rotation(arr[:, 5:14], rot_delta):
+            return True
+
+        return False
+
+    def _filter_frames(self, arr, trans_delta=0.005, rot_delta=np.pi/12, width_delta=0.005):
+        kept_frame_ids = [0]
+        id1 = 0
+        while True:
+            for id2 in range(id1+1, len(arr)):
+                if self._diff(arr, id1, id2, trans_delta, rot_delta, width_delta):
+                    id1 = id2
+                    kept_frame_ids.append(id2)
+                    break
+            if id2 == len(arr) - 1:
+                break
+        return arr[kept_frame_ids]
